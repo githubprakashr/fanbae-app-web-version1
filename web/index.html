@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content=" ">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Fanbae">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <meta name="theme-color" content="#000000">
+  <title>Fanbae</title>
+  <link rel="manifest" href="manifest.json?v=20260320">
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    var serviceWorkerVersion = '{{flutter_service_worker_version}}';
+
+    // Prevent startup crash from flutter_inappwebview web support scripts
+    // calling nativeCommunication before the bridge is registered.
+    window.flutter_inappwebview = window.flutter_inappwebview || {};
+    if (typeof window.flutter_inappwebview.nativeCommunication !== 'function') {
+      window.flutter_inappwebview.nativeCommunication = function () {
+        return Promise.resolve();
+      };
+    }
+  </script>
+
+  <!-- iOS Apple login -->
+  <script type="text/javascript"
+    src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+
+  <!-- Magic helper (SDK loads on demand from helper fallback CDNs) -->
+  <script src="magic_helper.js?v=20260320"></script>
+
+  <!-- Google login -->
+  <meta name="google-signin-client_id"
+    content="53658349575-32qhue3bksrg97atpt3i0b3060nrilr7.apps.googleusercontent.com">
+
+  <!-- Open new Tab -->
+  <script src="script.js" type="application/javascript"></script>
+
+  <style>
+    body {
+      width: 100%;
+      height: 100%;
+      background-color: #060713;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* Ensure Flutter app is visible */
+    flt-glass-pane {
+      z-index: 1;
+    }
+
+    .container {
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #060713;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .container.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--color);
+      animation: pulse 1s infinite ease-in-out;
+      animation-delay: calc(var(--i) * 0.1s);
+    }
+
+    .dot:nth-child(1) {
+      --color: #FFC107;
+    }
+
+    .dot:nth-child(2) {
+      --color: #F44336;
+    }
+
+    .dot:nth-child(3) {
+      --color: #E91E63;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+
+      50% {
+        transform: scale(1.6);
+        opacity: 1;
+      }
+    }
+
+    .grecaptcha-badge {
+      visibility: hidden !important;
+    }
+  </style>
+
+  <!-- Required for Flutter Web -->
+  <script src="flutter.js" defer></script>
+
+  <!-- 🔥 ADDED: Deep link handler for Web -->
+  <script>
+    window.Fanbae_DEEPLINK = window.location.href;
+  </script>
+
+</head>
+
+<body>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+
+  <div id="loading_indicator" class="container">
+    <img src="assets/assets/images/loading.gif" style="width: 150px; height: 150px;" alt="Loading..." />
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.9.1/firebase-analytics.js";
+    import { getMessaging } from "https://www.gstatic.com/firebasejs/9.9.1/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqz4Hs2-o72Odb5d_x7qbQ17BEwrL0eM0",
+      authDomain: "fanbae-99a9e.firebaseapp.com",
+      projectId: "fanbae-99a9e",
+      storageBucket: "fanbae-99a9e.firebasestorage.app",
+      messagingSenderId: "53658349575",
+      appId: "1:53658349575:web:fdf844b2c7ea2932fabaa2",
+      measurementId: "G-NM54QVPFMC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <!-- Pusher Beams SDK -->
+  <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
+
+  <script>
+    window.addEventListener('load', function (ev) {
+      var loading = document.querySelector('#loading_indicator');
+      var appStarted = false;
+      var checkCount = 0;
+
+      // Watch for actual Flutter content rendering (not just DOM elements)
+      function checkFlutterReady() {
+        const flutterView = document.querySelector('flt-glass-pane');
+        if (flutterView && flutterView.shadowRoot) {
+          const canvas = flutterView.shadowRoot.querySelector('flt-canvas-container, canvas');
+          // Wait for actual canvas content (not just empty canvas)
+          if (canvas) {
+            checkCount++;
+            // Give extra time for notification dialogs and initial content
+            if (checkCount > 3) {
+              hideLoader();
+              return;
+            }
+          }
+        }
+
+        if (!appStarted && checkCount < 50) {
+          setTimeout(checkFlutterReady, 100);
+        }
+      }
+
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: async function (engineInitializer) {
+          try {
+            let appRunner = await engineInitializer.initializeEngine({
+              renderer: "html"
+            });
+            await appRunner.runApp();
+          } catch (e) {
+            console.error('Flutter bootstrap failed:', e);
+            hideLoader();
+            return;
+          }
+
+          // Start checking after app runs
+          setTimeout(checkFlutterReady, 500);
+
+          // Fallback: Force hide after 6 seconds max
+          setTimeout(() => {
+            if (!appStarted) {
+              hideLoader();
+            }
+          }, 6000);
+        }
+      });
+
+      function hideLoader() {
+        if (appStarted) return;
+        appStarted = true;
+
+        if (loading) {
+          loading.classList.add('fade-out');
+          setTimeout(() => {
+            loading.style.display = 'none';
+          }, 500);
+        }
+      }
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('firebase-messaging-sw.js', {
+          scope: '/firebase-cloud-messaging-push-scope',
+        });
+      }
+    });
+  </script>
+
+</body>
+
+</html>

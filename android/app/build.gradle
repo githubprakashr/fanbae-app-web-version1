@@ -1,0 +1,118 @@
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+// Load keystore (optional)
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+def releaseStoreFilePath = keystoreProperties.getProperty("storeFile")
+def releaseStoreFile = releaseStoreFilePath ? file(releaseStoreFilePath) : null
+def hasValidReleaseKeystore = releaseStoreFile != null && releaseStoreFile.exists()
+
+android {
+    namespace "com.fanbae.tv"
+    compileSdkVersion 36
+    ndkVersion "26.1.10909125"
+
+    defaultConfig {
+        applicationId "com.fanbae.tv"
+        minSdkVersion 24
+        targetSdkVersion 36
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties["keyAlias"]
+            keyPassword keystoreProperties["keyPassword"]
+            storeFile releaseStoreFile
+            storePassword keystoreProperties["storePassword"]
+        }
+    }
+
+    buildTypes {
+        debug {
+            // signingConfig signingConfigs.release
+        }
+        release {
+            signingConfig hasValidReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+    }
+
+    packaging {
+        resources {
+            pickFirsts += ['org/bouncycastle/**']
+        }
+    }
+}
+
+dependencies {
+    // Core library desugaring
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.3"
+
+    // Firebase
+    implementation platform("com.google.firebase:firebase-bom:33.6.0")
+    implementation "com.google.firebase:firebase-analytics"
+    implementation "com.google.firebase:firebase-messaging"
+    implementation "com.google.firebase:firebase-crashlytics"
+
+    // AndroidX & Material
+    implementation "androidx.multidex:multidex:2.0.1"
+    implementation "com.google.android.material:material:1.12.0"
+
+
+    implementation ('com.google.android.gms:play-services-ads-lite:23.4.0') {
+        exclude group: 'com.google.android.gms', module: 'play-services-measurement-api'
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'org.bouncycastle:bcprov-jdk15to18:1.70'
+    }
+    exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
+}
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'

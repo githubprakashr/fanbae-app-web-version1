@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "53658349575",
+    "project_id": "fanbae-99a9e",
+    "storage_bucket": "fanbae-99a9e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53658349575:android:ba5b5345a1227314fabaa2",
+        "android_client_info": {
+          "package_name": "com.fanbae.tv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZVwPo35hK4uPCrpuKmGvA421VLrrIKVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
