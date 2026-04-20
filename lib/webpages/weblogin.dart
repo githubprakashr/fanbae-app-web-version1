@@ -851,48 +851,37 @@ class _WebLoginState extends State<WebLogin> {
           );
 
           if (!generalProvider.loading) {
-            if (generalProvider.loginModel.status == 200 &&
-                generalProvider.loginModel.result!.isNotEmpty) {
+            final loginData =
+                generalProvider.loginModel.result?.isNotEmpty == true
+                    ? generalProvider.loginModel.result!.first
+                    : null;
+
+            if (generalProvider.loginModel.status == 200 && loginData != null) {
               // Save user credentials
               await Utils.saveUserCreds(
-                userID: generalProvider.loginModel.result?[0].id.toString(),
-                channeId:
-                    generalProvider.loginModel.result?[0].channelId.toString(),
-                channelName: generalProvider.loginModel.result?[0].channelName
-                    .toString(),
-                fullName:
-                    generalProvider.loginModel.result?[0].fullName.toString(),
-                email: generalProvider.loginModel.result?[0].email.toString(),
-                mobileNumber: generalProvider.loginModel.result?[0].mobileNumber
-                    .toString(),
-                countrycode: generalProvider.loginModel.result?[0].countryCode
-                    .toString(),
-                countryname: generalProvider.loginModel.result?[0].channelName
-                    .toString(),
-                image: generalProvider.loginModel.result?[0].image.toString(),
-                coverImg:
-                    generalProvider.loginModel.result?[0].coverImg.toString(),
-                deviceType:
-                    generalProvider.loginModel.result?[0].deviceType.toString(),
-                deviceToken: generalProvider.loginModel.result?[0].deviceToken
-                    .toString(),
-                userIsBuy:
-                    generalProvider.loginModel.result?[0].isBuy.toString(),
-                isAdsFree:
-                    generalProvider.loginModel.result?[0].adsFree.toString(),
-                isCreator:
-                    generalProvider.loginModel.result?[0].isCreator.toString(),
-                walletBalance: generalProvider
-                    .loginModel.result?[0].walletBalance
-                    .toString(),
-                isDownload:
-                    generalProvider.loginModel.result?[0].isDownload.toString(),
+                userID: loginData.id.toString(),
+                channeId: loginData.channelId.toString(),
+                channelName: loginData.channelName.toString(),
+                fullName: loginData.fullName.toString(),
+                email: loginData.email.toString(),
+                mobileNumber: loginData.mobileNumber.toString(),
+                countrycode: loginData.countryCode.toString(),
+                countryname: loginData.channelName.toString(),
+                image: loginData.image.toString(),
+                coverImg: loginData.coverImg.toString(),
+                deviceType: loginData.deviceType.toString(),
+                deviceToken: loginData.deviceToken.toString(),
+                userIsBuy: loginData.isBuy.toString(),
+                isAdsFree: loginData.adsFree.toString(),
+                isCreator: loginData.isCreator.toString(),
+                walletBalance: loginData.walletBalance.toString(),
+                isDownload: loginData.isDownload.toString(),
               );
 
               // Setup push notifications
               if (!kIsWeb) {
                 await FirebaseService.setupUserNotifications(
-                  generalProvider.loginModel.result?[0].id.toString() ?? '',
+                  loginData.id.toString(),
                 );
               }
 
@@ -953,45 +942,38 @@ class _WebLoginState extends State<WebLogin> {
       );
 
       if (!generalProvider.loading) {
-        if (generalProvider.loginModel.status == 200 &&
-            generalProvider.loginModel.result!.isNotEmpty) {
+        final loginData = generalProvider.loginModel.result?.isNotEmpty == true
+            ? generalProvider.loginModel.result!.first
+            : null;
+
+        if (generalProvider.loginModel.status == 200 && loginData != null) {
           // Save user credentials from backend response
           printLog("✅ Backend login successful - saving user data...");
 
           await Utils.saveUserCreds(
-            userID: generalProvider.loginModel.result?[0].id.toString(),
-            channeId:
-                generalProvider.loginModel.result?[0].channelId.toString(),
-            channelName:
-                generalProvider.loginModel.result?[0].channelName.toString(),
-            fullName: generalProvider.loginModel.result?[0].fullName.toString(),
-            email: generalProvider.loginModel.result?[0].email.toString(),
-            mobileNumber:
-                generalProvider.loginModel.result?[0].mobileNumber.toString(),
-            countrycode:
-                generalProvider.loginModel.result?[0].countryCode.toString(),
-            countryname:
-                generalProvider.loginModel.result?[0].channelName.toString(),
-            image: generalProvider.loginModel.result?[0].image.toString(),
-            coverImg: generalProvider.loginModel.result?[0].coverImg.toString(),
-            deviceType:
-                generalProvider.loginModel.result?[0].deviceType.toString(),
-            deviceToken:
-                generalProvider.loginModel.result?[0].deviceToken.toString(),
-            userIsBuy: generalProvider.loginModel.result?[0].isBuy.toString(),
-            isAdsFree: generalProvider.loginModel.result?[0].adsFree.toString(),
-            isCreator:
-                generalProvider.loginModel.result?[0].isCreator.toString(),
-            walletBalance:
-                generalProvider.loginModel.result?[0].walletBalance.toString(),
-            isDownload:
-                generalProvider.loginModel.result?[0].isDownload.toString(),
+            userID: loginData.id.toString(),
+            channeId: loginData.channelId.toString(),
+            channelName: loginData.channelName.toString(),
+            fullName: loginData.fullName.toString(),
+            email: loginData.email.toString(),
+            mobileNumber: loginData.mobileNumber.toString(),
+            countrycode: loginData.countryCode.toString(),
+            countryname: loginData.channelName.toString(),
+            image: loginData.image.toString(),
+            coverImg: loginData.coverImg.toString(),
+            deviceType: loginData.deviceType.toString(),
+            deviceToken: loginData.deviceToken.toString(),
+            userIsBuy: loginData.isBuy.toString(),
+            isAdsFree: loginData.adsFree.toString(),
+            isCreator: loginData.isCreator.toString(),
+            walletBalance: loginData.walletBalance.toString(),
+            isDownload: loginData.isDownload.toString(),
           );
 
           // Setup push notifications
           if (!kIsWeb) {
             await FirebaseService.setupUserNotifications(
-              generalProvider.loginModel.result?[0].id.toString() ?? '',
+              loginData.id.toString(),
             );
           }
 
@@ -1121,41 +1103,34 @@ class _WebLoginState extends State<WebLogin> {
     printLog('checkAndNavigate loading ==>> ${loginItem.loading}');
 
     if (!loginItem.loading) {
-      if (loginItem.loginModel.status == 200 &&
-          loginItem.loginModel.result!.isNotEmpty) {
+      final loginData = generalProvider.loginModel.result?.isNotEmpty == true
+          ? generalProvider.loginModel.result!.first
+          : null;
+
+      if (loginItem.loginModel.status == 200 && loginData != null) {
         Utils.saveUserCreds(
-            userID: generalProvider.loginModel.result?[0].id.toString(),
-            channeId:
-                generalProvider.loginModel.result?[0].channelId.toString(),
-            channelName:
-                generalProvider.loginModel.result?[0].channelName.toString(),
-            fullName: generalProvider.loginModel.result?[0].fullName.toString(),
-            email: generalProvider.loginModel.result?[0].email.toString(),
-            mobileNumber:
-                generalProvider.loginModel.result?[0].mobileNumber.toString(),
-            countrycode:
-                generalProvider.loginModel.result?[0].countryCode.toString(),
-            countryname:
-                generalProvider.loginModel.result?[0].channelName.toString(),
-            image: generalProvider.loginModel.result?[0].image.toString(),
-            coverImg: generalProvider.loginModel.result?[0].coverImg.toString(),
-            deviceType:
-                generalProvider.loginModel.result?[0].deviceType.toString(),
-            deviceToken:
-                generalProvider.loginModel.result?[0].deviceToken.toString(),
-            userIsBuy: generalProvider.loginModel.result?[0].isBuy.toString(),
-            isAdsFree: generalProvider.loginModel.result?[0].adsFree.toString(),
-            isCreator:
-                generalProvider.loginModel.result?[0].isCreator.toString(),
-            walletBalance:
-                generalProvider.loginModel.result?[0].walletBalance.toString(),
-            isDownload:
-                generalProvider.loginModel.result?[0].isDownload.toString());
+            userID: loginData.id.toString(),
+            channeId: loginData.channelId.toString(),
+            channelName: loginData.channelName.toString(),
+            fullName: loginData.fullName.toString(),
+            email: loginData.email.toString(),
+            mobileNumber: loginData.mobileNumber.toString(),
+            countrycode: loginData.countryCode.toString(),
+            countryname: loginData.channelName.toString(),
+            image: loginData.image.toString(),
+            coverImg: loginData.coverImg.toString(),
+            deviceType: loginData.deviceType.toString(),
+            deviceToken: loginData.deviceToken.toString(),
+            userIsBuy: loginData.isBuy.toString(),
+            isAdsFree: loginData.adsFree.toString(),
+            isCreator: loginData.isCreator.toString(),
+            walletBalance: loginData.walletBalance.toString(),
+            isDownload: loginData.isDownload.toString());
 
         // Setup push notifications
         if (!kIsWeb) {
           await FirebaseService.setupUserNotifications(
-            generalProvider.loginModel.result?[0].id.toString() ?? '',
+            loginData.id.toString(),
           );
         }
 

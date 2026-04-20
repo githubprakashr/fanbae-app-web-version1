@@ -160,10 +160,12 @@ class _FeedsState extends State<Feeds> {
     if (Constant.userID != null) {
       await profileProvider.getprofile(context, Constant.userID);
       await homeProvider.getprofile(Constant.userID);
-      await sharePref.save(
-          "userpanelstatus",
-          homeProvider.profileModel.result?[0].userPenalStatus.toString() ??
-              "");
+      if (homeProvider.profileModel.result?.isNotEmpty == true) {
+        await sharePref.save("userpanelstatus",
+            homeProvider.profileModel.result!.first.userPenalStatus.toString());
+      } else {
+        await sharePref.save("userpanelstatus", "");
+      }
       Constant.userPanelStatus = await sharePref.read("userpanelstatus");
 
       await Utils.getCustomAdsStatus();
@@ -1988,17 +1990,17 @@ class _FeedsState extends State<Feeds> {
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height,
                     fit: BoxFit.cover,
-                    imagePath: feedProvider.feeds![index].postContent?[0]
-                                ["content_type"] ==
-                            1
-                        ? (feedProvider
-                                .feeds?[index].postContent?[0]["content_url"]
-                                .toString() ??
-                            "")
-                        : (feedProvider.feeds?[index]
-                                .postContent?[0]["thumbnail_image"]
-                                .toString() ??
-                            ""),
+                    imagePath: (() {
+                      final postContent =
+                          feedProvider.feeds?[index].postContent;
+                      if (postContent == null || postContent.isEmpty) return "";
+                      final firstPost = postContent[0];
+                      final contentType = firstPost["content_type"] as int?;
+                      if (contentType == 1) {
+                        return firstPost["content_url"]?.toString() ?? "";
+                      }
+                      return firstPost["thumbnail_image"]?.toString() ?? "";
+                    })(),
                   ),
                 )),
             // 🔹 Pay button overlay (bottom left)
@@ -2145,10 +2147,13 @@ class _FeedsState extends State<Feeds> {
                                 builder: (context) {
                                   return ViewMembershipPlan(
                                     isUser: false,
-                                    creatorId: profileProvider
-                                            .profileModel.result?[0].id
-                                            .toString() ??
-                                        '0',
+                                    creatorId: (profileProvider.profileModel
+                                                .result?.isNotEmpty ==
+                                            true
+                                        ? profileProvider
+                                            .profileModel.result!.first.id
+                                            .toString()
+                                        : '0'),
                                   );
                                 },
                               ),
@@ -2200,7 +2205,8 @@ class _FeedsState extends State<Feeds> {
               ),
             ),
 
-            feedProvider.feeds?[index].postContent?[0]["content_type"] == 1
+            (postFeed.postContent?.isNotEmpty == true &&
+                    postFeed.postContent![0]["content_type"] == 1)
                 ? const SizedBox.shrink()
                 : Positioned.fill(
                     child: Align(
@@ -2283,9 +2289,19 @@ class _FeedsState extends State<Feeds> {
   Widget postContent(index, feed.Result postFeed) {
     final bool isSubscribed = postFeed.isSubscriber != 0;
     final bool isSubscribing = postFeed.purchasePackage == 0;
-    if (feedProvider.feeds?[index].postContent != null &&
-        ((feedProvider.feeds?[index].postContent?.length ?? 0) > 0)) {
-      if ((feedProvider.feeds?[index].postContent?.length ?? 0) == 1) {
+    final postContent = postFeed.postContent;
+    final bool hasPostContent = postContent != null && postContent.isNotEmpty;
+    final dynamic firstPostContent = hasPostContent ? postContent![0] : null;
+    final bool isVideoPostContent = hasPostContent &&
+        firstPostContent != null &&
+        firstPostContent["content_type"]?.toString() == "1";
+    final String postContentImagePath = hasPostContent
+        ? (isVideoPostContent
+            ? firstPostContent["content_url"]?.toString() ?? ""
+            : firstPostContent["thumbnail_image"]?.toString() ?? "")
+        : "";
+    if (postContent != null && postContent.isNotEmpty) {
+      if (postContent.length == 1) {
         return SizedBox(
           width: MediaQuery.of(context).size.width,
           height: kIsWeb ? 200 : 300,
@@ -2331,21 +2347,9 @@ class _FeedsState extends State<Feeds> {
                           width: MediaQuery.of(context).size.width,
                           height: MediaQuery.of(context).size.height,
                           fit: BoxFit.cover,
-                          imagePath: feedProvider.feeds![index].postContent?[0]
-                                      ["content_type"] ==
-                                  1
-                              ? (feedProvider.feeds?[index]
-                                      .postContent?[0]["content_url"]
-                                      .toString() ??
-                                  "")
-                              : (feedProvider.feeds?[index]
-                                      .postContent?[0]["thumbnail_image"]
-                                      .toString() ??
-                                  ""),
+                          imagePath: postContentImagePath,
                         ),
-                        feedProvider.feeds?[index].postContent?[0]
-                                    ["content_type"] ==
-                                1
+                        isVideoPostContent
                             ? const SizedBox.shrink()
                             : Positioned.fill(
                                 child: Align(
@@ -2455,12 +2459,18 @@ class _FeedsState extends State<Feeds> {
                                             builder: (context) {
                                               return ViewMembershipPlan(
                                                 isUser: false,
-                                                creatorId: profileProvider
+                                                creatorId: (profileProvider
+                                                            .profileModel
+                                                            .result
+                                                            ?.isNotEmpty ==
+                                                        true
+                                                    ? profileProvider
                                                         .profileModel
-                                                        .result?[0]
+                                                        .result!
+                                                        .first
                                                         .id
-                                                        .toString() ??
-                                                    '0',
+                                                        .toString()
+                                                    : '0'),
                                               );
                                             },
                                           ),
@@ -2566,21 +2576,9 @@ class _FeedsState extends State<Feeds> {
                           width: MediaQuery.of(context).size.width,
                           height: MediaQuery.of(context).size.height,
                           fit: BoxFit.cover,
-                          imagePath: feedProvider.feeds![index].postContent?[0]
-                                      ["content_type"] ==
-                                  1
-                              ? (feedProvider.feeds?[index]
-                                      .postContent?[0]["content_url"]
-                                      .toString() ??
-                                  "")
-                              : (feedProvider.feeds?[index]
-                                      .postContent?[0]["thumbnail_image"]
-                                      .toString() ??
-                                  ""),
+                          imagePath: postContentImagePath,
                         ),
-                        feedProvider.feeds?[index].postContent?[0]
-                                    ["content_type"] ==
-                                1
+                        isVideoPostContent
                             ? const SizedBox.shrink()
                             : Positioned.fill(
                                 child: Align(
@@ -3702,7 +3700,11 @@ class _FeedsState extends State<Feeds> {
       ),
       isScrollControlled: true,
       builder: (context) {
-        debugPrint(detailsProvider.detailsModel.result?[0].userId.toString());
+        final detailsUser =
+            (detailsProvider.detailsModel.result?.isNotEmpty == true
+                ? detailsProvider.detailsModel.result!.first
+                : null);
+        debugPrint(detailsUser?.userId.toString() ?? 'user-empty');
         debugPrint(Constant.userID);
 
         return Padding(
@@ -3768,15 +3770,19 @@ class _FeedsState extends State<Feeds> {
                       Navigator.pop(context);
                       print('liveUrl contentType :$contentType');
                       final liveUrl = contentType == 1
-                          ? "Hey! I'm watching ${detailsProvider.detailsModel.result?[0].title ?? ""} "
+                          ? "Hey! I'm watching ${detailsUser?.title ?? ""} "
                               "on ${Constant.appName}! 🎬\n"
-                              "Watch here 👉 https://fanbae.tv/video?v=$contentid/$isComment/${detailsProvider.detailsModel.result?[0].content?.split('/')[3]}\n"
-                          : "Hey! I'm watching ${detailsProvider.detailsModel.result?[0].title ?? ""} "
+                              "Watch here 👉 https://fanbae.tv/video?v=$contentid/$isComment/${detailsUser?.content?.split('/')[3] ?? ""}\n"
+                          : "Hey! I'm watching ${detailsUser?.title ?? ""} "
                               "on ${Constant.appName}! 🎬\n"
-                              "Watch here 👉 https://fanbae.tv/live?l=$contentid/$isComment/${detailsProvider.detailsModel.result?[0].content?.split('/')[3]}\n";
+                              "Watch here 👉 https://fanbae.tv/live?l=$contentid/$isComment/${detailsUser?.content?.split('/')[3] ?? ""}\n";
                       Utils.shareApp(liveUrl);
                     }),
-                  detailsProvider.detailsModel.result?[0].userId.toString() ==
+                  (detailsProvider.detailsModel.result?.isNotEmpty == true
+                              ? detailsProvider
+                                  .detailsModel.result!.first.userId
+                                  .toString()
+                              : '') ==
                           Constant.userID
                       ? const SizedBox()
                       : Utils.moreFunctionItem("report.png", "report",

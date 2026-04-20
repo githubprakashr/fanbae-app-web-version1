@@ -3,6 +3,7 @@ import 'package:fanbae/utils/color.dart';
 
 class Constant {
   final String baseurl = "https://fanbae.com/adminpanel/public/api/";
+  // final String baseurl = "http://adminpanelmain.local/public/api/";lu
 
   static String userPanelUrl = "";
 

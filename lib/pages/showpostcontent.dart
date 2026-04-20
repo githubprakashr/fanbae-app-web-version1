@@ -72,6 +72,23 @@ class _ShowPostContentState extends State<ShowPostContent> {
     attachment = widget.attachment ?? '';
   }
 
+  bool get _hasPostContent =>
+      widget.postContent is List && (widget.postContent as List).isNotEmpty;
+
+  dynamic get _firstPostContent =>
+      _hasPostContent ? widget.postContent[0] : null;
+
+  bool get _firstPostContentIsVideo =>
+      _firstPostContent != null && _firstPostContent["content_type"] == 1;
+
+  String get _firstPostContentImagePath {
+    if (!_hasPostContent) return "";
+    if (_firstPostContentIsVideo) {
+      return _firstPostContent["content_url"]?.toString() ?? "";
+    }
+    return _firstPostContent["thumbnail_image"]?.toString() ?? "";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,12 +165,7 @@ class _ShowPostContentState extends State<ShowPostContent> {
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height,
                     fit: BoxFit.cover,
-                    imagePath: widget.postContent?[0]["content_type"] == 1
-                        ? (widget.postContent?[0]["content_url"].toString() ??
-                            "")
-                        : (widget.postContent?[0]["thumbnail_image"]
-                                .toString() ??
-                            ""),
+                    imagePath: _firstPostContentImagePath,
                   ),
                 )),
             // 🔹 Pay button overlay (bottom left)
@@ -219,7 +231,7 @@ class _ShowPostContentState extends State<ShowPostContent> {
                 ),
               ),
             ),
-            widget.postContent?[0]["content_type"] == 1
+            _firstPostContentIsVideo
                 ? const SizedBox.shrink()
                 : Positioned.fill(
                     child: Align(

@@ -131,12 +131,10 @@ class BottombarState extends State<Bottombar> with TickerProviderStateMixin {
     if (Constant.userID != null) {
       await profileProvider.getprofile(context, Constant.userID);
       if (profileProvider.profileModel.status == 200 &&
-          profileProvider.profileModel.result != null) {
+          profileProvider.profileModel.result?.isNotEmpty == true) {
+        final userProfile = profileProvider.profileModel.result!.first;
         await sharedPre.save(
-            "userpanelstatus",
-            profileProvider.profileModel.result?[0].userPenalStatus
-                    .toString() ??
-                "");
+            "userpanelstatus", userProfile.userPenalStatus.toString());
         Constant.userPanelStatus = await sharedPre.read("userpanelstatus");
 
         if (!kIsWeb) {

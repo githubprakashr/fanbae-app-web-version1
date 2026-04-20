@@ -4439,6 +4439,18 @@ class _ProfileState extends State<Profile> {
   }
 
   payPostApi(index) {
+    final postContents = profileProvider.channelFeedList?[index].postContent;
+    final bool hasPostContents = postContents != null &&
+        (postContents is List ? postContents.isNotEmpty : false);
+    final dynamic firstPostContent = hasPostContents ? postContents![0] : null;
+    final bool firstIsVideo =
+        firstPostContent != null && firstPostContent.contentType == 1;
+    final String postContentImagePath = hasPostContents
+        ? (firstIsVideo
+            ? firstPostContent.contentUrl?.toString() ?? ""
+            : firstPostContent.thumbnailImage?.toString() ?? "")
+        : "";
+
     return Center(
       child: Container(
         height: 210,
@@ -4572,9 +4584,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
-            profileProvider
-                        .channelFeedList?[index].postContent?[0].contentType ==
-                    1
+            firstIsVideo
                 ? const SizedBox.shrink()
                 : Positioned.fill(
                     child: Align(

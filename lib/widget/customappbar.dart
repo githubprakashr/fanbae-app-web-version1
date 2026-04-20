@@ -47,7 +47,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
   void initState() {
     homeProvider = Provider.of<HomeProvider>(context, listen: false);
     profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-    profileProvider = Provider.of<ProfileProvider>(context, listen: false);
     getApi();
     // Fetch notifications on app bar init
     if (Constant.userID != null) {
@@ -147,7 +146,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
                                     child: Text(
                                       (() {
                                         final result = profileProvider
-                                            .profileModel.result?[0];
+                                                    .profileModel
+                                                    .result
+                                                    ?.isNotEmpty ==
+                                                true
+                                            ? profileProvider
+                                                .profileModel.result![0]
+                                            : null;
                                         if (result == null ||
                                             result.isBuy != 1) {
                                           return isSmallScreen
@@ -231,14 +236,20 @@ class _CustomAppBarState extends State<CustomAppBar> {
                                 SizedBox(width: isSmallScreen ? 8 : 12),
                                 Consumer<ProfileProvider>(
                                   builder: (context, settingProvider, _) {
+                                    final walletBalance = profileProvider
+                                                .profileModel
+                                                .result
+                                                ?.isNotEmpty ==
+                                            true
+                                        ? profileProvider.profileModel
+                                            .result![0].walletBalance
+                                            .toString()
+                                        : '0';
                                     return MyText(
                                       color: white,
                                       fontsizeWeb: 13,
                                       multilanguage: false,
-                                      text: profileProvider.profileModel
-                                              .result?[0].walletBalance
-                                              .toString() ??
-                                          '0',
+                                      text: walletBalance,
                                       textalign: TextAlign.center,
                                       fontsizeNormal: isSmallScreen
                                           ? Dimens.textSmall

@@ -152,30 +152,37 @@ class _OtpState extends State<Otp> {
       if (!mounted) return;
       provider.setLoading(false);
       if (provider.loginModel.status == 200) {
+        final loginData = provider.loginModel.result?.isNotEmpty == true
+            ? provider.loginModel.result![0]
+            : null;
+
+        if (loginData == null) {
+          Utils().showSnackBar(context, "Login data missing", false);
+          return;
+        }
+
         final serverMobile =
-            provider.loginModel.result?[0].mobileNumber?.toString() ??
-                widget.fullnumber;
+            loginData.mobileNumber?.toString() ?? widget.fullnumber;
         final savedMobile = _localMobileFromAny(serverMobile);
 
         Utils.saveUserCreds(
-            userID: provider.loginModel.result?[0].id.toString(),
-            channeId: provider.loginModel.result?[0].channelId.toString(),
-            channelName: provider.loginModel.result?[0].channelName.toString(),
-            fullName: provider.loginModel.result?[0].fullName.toString(),
-            email: provider.loginModel.result?[0].email.toString(),
+            userID: loginData.id.toString(),
+            channeId: loginData.channelId.toString(),
+            channelName: loginData.channelName.toString(),
+            fullName: loginData.fullName.toString(),
+            email: loginData.email.toString(),
             mobileNumber: savedMobile,
-            countrycode: provider.loginModel.result?[0].countryCode.toString(),
-            countryname: provider.loginModel.result?[0].channelName.toString(),
-            image: provider.loginModel.result?[0].image.toString(),
-            coverImg: provider.loginModel.result?[0].coverImg.toString(),
-            deviceType: provider.loginModel.result?[0].deviceType.toString(),
-            deviceToken: provider.loginModel.result?[0].deviceToken.toString(),
-            userIsBuy: provider.loginModel.result?[0].isBuy.toString(),
-            isAdsFree: provider.loginModel.result?[0].adsFree.toString(),
-            isDownload: provider.loginModel.result?[0].isDownload.toString(),
-            isCreator: provider.loginModel.result?[0].isCreator.toString(),
-            walletBalance:
-                provider.loginModel.result?[0].walletBalance.toString());
+            countrycode: loginData.countryCode.toString(),
+            countryname: loginData.channelName.toString(),
+            image: loginData.image.toString(),
+            coverImg: loginData.coverImg.toString(),
+            deviceType: loginData.deviceType.toString(),
+            deviceToken: loginData.deviceToken.toString(),
+            userIsBuy: loginData.isBuy.toString(),
+            isAdsFree: loginData.adsFree.toString(),
+            isDownload: loginData.isDownload.toString(),
+            isCreator: loginData.isCreator.toString(),
+            walletBalance: loginData.walletBalance.toString());
 
         Navigator.pushAndRemoveUntil(
           context,
